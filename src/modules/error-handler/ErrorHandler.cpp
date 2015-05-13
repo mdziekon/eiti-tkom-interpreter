@@ -5,11 +5,16 @@
 
 using ErrorHandler = tkom::modules::ErrorHandler;
 
-void ErrorHandler::error(const std::string& message)
+void ErrorHandler::error(const std::string& message, const bool& noThrow)
 {
     std::cout << ErrorHandler::colorize("[Error]", "red")
               << " " << message
               << std::endl;
+
+    if (noThrow)
+    {
+        return;
+    }
 
     throw ErrorHandler::Exception(message);
 }
