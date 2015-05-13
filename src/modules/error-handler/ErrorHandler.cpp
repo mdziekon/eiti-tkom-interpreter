@@ -4,7 +4,20 @@
 #include <iostream>
 
 using ErrorHandler = tkom::modules::ErrorHandler;
+using Exception = tkom::modules::ErrorHandler::Exception;
 
+// Exception class
+Exception::Exception(const std::string& error) noexcept:
+error(error)
+{}
+
+const char* Exception::what() const noexcept
+{
+    return this->error.c_str();
+}
+
+
+// ErrorHandler class
 void ErrorHandler::error(const std::string& message, const bool& noThrow)
 {
     std::cout << ErrorHandler::colorize("[Error]", "red")
@@ -58,13 +71,4 @@ const std::string ErrorHandler::colorize(const std::string& message, const std::
     }
 
     return message;
-}
-
-ErrorHandler::Exception::Exception(const std::string& error) noexcept:
-error(error)
-{}
-
-const char* ErrorHandler::Exception::what() const noexcept
-{
-    return this->error.c_str();
 }

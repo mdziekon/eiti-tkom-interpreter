@@ -18,6 +18,19 @@ namespace tkom { namespace modules
     class ErrorHandler
     {
     public:
+        class Exception: public std::exception
+        {
+            friend class ErrorHandler;
+
+        public:
+            virtual const char* what() const noexcept;
+
+        private:
+            Exception(const std::string& error) noexcept;
+
+            const std::string error;
+        };
+
         static void error(const std::string& message, const bool& noThrow = false);
         static void warning(const std::string& message);
         static void notice(const std::string& message);
@@ -26,16 +39,6 @@ namespace tkom { namespace modules
         static const std::map<std::string, const unsigned int>& getColors();
 
         static const std::string colorize(const std::string& message, const std::string& color);
-
-        class Exception: public std::exception
-        {
-        public:
-            Exception(const std::string& error) noexcept;
-            virtual const char* what() const noexcept;
-
-        private:
-            const std::string error;
-        };
     };
 }}
 
