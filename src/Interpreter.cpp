@@ -1,18 +1,37 @@
 #include "Interpreter.hpp"
 
 #include "modules/error-handler/ErrorHandler.hpp"
+#include "modules/lexer/Lexer.hpp"
 
-tkom::Interpreter::Interpreter(const std::vector<std::string>& arguments)
+#include <iostream>
+
+using Interpreter = tkom::Interpreter;
+using ErrorHandler = tkom::modules::ErrorHandler;
+using Lexer = tkom::modules::Lexer;
+
+Interpreter::Interpreter(const std::vector<std::string>& arguments)
 {
     try
     {
-        modules::ErrorHandler::error("Hello world!");
+        if (arguments.size() < 1)
+        {
+            ErrorHandler::error("No input file specified");
+        }
+
+        Lexer lexer(arguments.at(0));
+
+        Token token;
+
+        do
+        {
+            token = lexer.nextToken();
+
+            std::cout << tkom::modules::utils::getTokenTypeName(token.type) << " = " << token.value << std::endl;
+        }
+        while(token.type != TokenType::Invalid && token.type != TokenType::EndOfFile);
     }
-    catch (std::exception& e)
-    {}
-
-    modules::ErrorHandler::warning("Hello world!");
-    modules::ErrorHandler::notice("Hello world!");
-
-    // Main program body
+    catch(ErrorHandler::Exception &e)
+    {
+        ErrorHandler::error("Terminating...", true);
+    }
 }
