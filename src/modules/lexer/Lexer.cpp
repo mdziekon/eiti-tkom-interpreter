@@ -48,10 +48,12 @@ const Token Lexer::nextToken()
 
         if (utils::keywords.count(buffer) == 1)
         {
+            // Keyword
             token.type = utils::keywords.at(buffer);
         }
         else
         {
+            // Identifier
             token.type = TokenType::Identifier;
             token.value = buffer;
         }
@@ -72,6 +74,7 @@ const Token Lexer::nextToken()
         this->reader.rewind();
 
         token.type = TokenType::NumberLiteral;
+        token.value = buffer;
     }
     else
     {
