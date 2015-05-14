@@ -89,7 +89,7 @@ namespace tkom { namespace modules { namespace utils
 
     inline const std::string getTokenTypeName(const TokenType& tokenType)
     {
-        return tokenTypeNames.at((unsigned int) tokenType);
+        return tokenTypeNames.at(static_cast<unsigned int>(tokenType));
     };
 }}}
 
