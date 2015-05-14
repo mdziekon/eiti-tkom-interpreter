@@ -2,12 +2,12 @@
 
 #include "modules/error-handler/ErrorHandler.hpp"
 #include "modules/lexer/Lexer.hpp"
-
-#include <iostream>
+#include "modules/parser/Parser.hpp"
 
 using Interpreter = tkom::Interpreter;
 using ErrorHandler = tkom::modules::ErrorHandler;
 using Lexer = tkom::modules::Lexer;
+using Parser = tkom::modules::Parser;
 
 Interpreter::Interpreter(const std::vector<std::string>& arguments)
 {
@@ -19,16 +19,9 @@ Interpreter::Interpreter(const std::vector<std::string>& arguments)
         }
 
         Lexer lexer(arguments.at(0));
+        Parser parser(lexer);
 
-        Token token;
-
-        do
-        {
-            token = lexer.nextToken();
-
-            std::cout << tkom::modules::utils::getTokenTypeName(token.type) << " = " << token.value << std::endl;
-        }
-        while(token.type != TokenType::Invalid && token.type != TokenType::EndOfFile);
+        parser.parse();
     }
     catch(ErrorHandler::Exception &e)
     {
