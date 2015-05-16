@@ -44,7 +44,8 @@ namespace tkom { namespace modules { namespace utils
         Identifier          = 33,
         NumberLiteral       = 34,
         Invalid             = 35,
-        EndOfFile           = 36
+        EndOfFile           = 36,
+        Undefined           = 37
     };
 
     const std::unordered_map<unsigned int, std::string> tokenTypeNames = {
@@ -84,7 +85,8 @@ namespace tkom { namespace modules { namespace utils
         { 33, "Identifier"},
         { 34, "NumberLiteral"},
         { 35, "Invalid"},
-        { 36, "EndOfFile"}
+        { 36, "EndOfFile"},
+        { 37, "Undefined"}
     };
 
     inline const std::string getTokenTypeName(const TokenType& tokenType)
