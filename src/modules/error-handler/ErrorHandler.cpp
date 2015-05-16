@@ -18,6 +18,15 @@ const char* Exception::what() const noexcept
 
 
 // ErrorHandler class
+void ErrorHandler::debugFatal(const std::string& message)
+{
+    std::cout << ErrorHandler::colorize("[Fatal]", "magenta")
+              << " " << message
+              << std::endl;
+
+    throw ErrorHandler::Exception(message);
+}
+
 void ErrorHandler::error(const std::string& message, const bool& noThrow)
 {
     std::cout << ErrorHandler::colorize("[Error]", "red")
@@ -51,7 +60,8 @@ const std::map<std::string, const unsigned int>& ErrorHandler::getColors()
     static const std::map<std::string, const unsigned int> colors = {
         { "red", 31 },
         { "yellow", 33 },
-        { "cyan", 36 }
+        { "cyan", 36 },
+        { "magenta", 35 }
     };
 
     return colors;

@@ -31,6 +31,7 @@ namespace tkom { namespace modules
             const std::string error;
         };
 
+        static void debugFatal(const std::string& message);
         static void error(const std::string& message, const bool& noThrow = false);
         static void warning(const std::string& message);
         static void notice(const std::string& message);
