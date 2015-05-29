@@ -11,6 +11,9 @@ namespace tkom { namespace modules { namespace utils
 {
     struct Token
     {
+        Token() = default;
+        Token(const TokenType& type): type(type) {}
+
         TokenType type = TokenType::Invalid;
         std::string value = "";
 

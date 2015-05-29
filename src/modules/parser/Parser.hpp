@@ -6,6 +6,8 @@
 #include "../utils/Token.hpp"
 #include "../utils/TokenType.hpp"
 
+#include "../tracer/Tracer.hpp"
+
 using Token = tkom::modules::utils::Token;
 using TokenType = tkom::modules::utils::TokenType;
 
@@ -21,6 +23,8 @@ namespace tkom { namespace modules
         void parse();
 
     private:
+        Tracer tracer = Tracer(true);
+
         Lexer& lexer;
         Token previousToken;
 
@@ -50,12 +54,9 @@ namespace tkom { namespace modules
         void parseLiteral();
         void parseMatrixLiteral();
 
-        void parseExpression();
-        void parseMultiplicativeExpression();
-        void parsePrimaryExpression();
-        void parseExpression(const Token& firstToken);
-        void parseMultiplicativeExpression(const Token& firstToken);
-        void parsePrimaryExpression(const Token& firstToken);
+        void parseExpression(const Token& firstToken = Token(TokenType::Undefined));
+        void parseMultiplicativeExpression(const Token& firstToken = Token(TokenType::Undefined));
+        void parsePrimaryExpression(const Token& firstToken = Token(TokenType::Undefined));
 
         void parseCondition();
         void parseAndCondition();

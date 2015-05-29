@@ -381,49 +381,6 @@ void Parser::parseMatrixLiteral()
     }
 }
 
-void Parser::parseExpression()
-{
-    this->parseMultiplicativeExpression();
-
-    while (this->peek({ TokenType::Plus, TokenType::Minus }))
-    {
-        this->accept({ TokenType::Plus, TokenType::Minus });
-        this->parseMultiplicativeExpression();
-    }
-}
-
-void Parser::parseMultiplicativeExpression()
-{
-    this->parsePrimaryExpression();
-
-    while (this->peek({ TokenType::Multiply, TokenType::Divide, TokenType::Modulo }))
-    {
-        this->accept({ TokenType::Multiply, TokenType::Divide, TokenType::Modulo });
-        this->parsePrimaryExpression();
-    }
-}
-
-void Parser::parsePrimaryExpression()
-{
-    if (this->peek({ TokenType::ParenthOpen }))
-    {
-        this->accept({ TokenType::ParenthOpen });
-        this->parseExpression();
-        this->accept({ TokenType::ParenthClose });
-
-        return;
-    }
-
-    if (this->peek({ TokenType::Identifier }))
-    {
-        this->parseVariable();
-
-        return;
-    }
-
-    this->parseLiteral();
-}
-
 void Parser::parseExpression(const Token& firstToken)
 {
     this->parseMultiplicativeExpression(firstToken);
@@ -448,18 +405,41 @@ void Parser::parseMultiplicativeExpression(const Token& firstToken)
 
 void Parser::parsePrimaryExpression(const Token& firstToken)
 {
-    if (!this->isAcceptable(firstToken, { TokenType::Identifier }))
+    if (firstToken.type != TokenType::Undefined)
     {
-        ErrorHandler::error(
-            std::string("Unexpected token: ")
-                .append(tkom::modules::utils::getTokenTypeName(firstToken.type))
-                .append(" (Line: ")
-                .append(std::to_string(firstToken.line))
-                .append(", Pos: ")
-                .append(std::to_string(firstToken.pos))
-                .append(")")
-        );
+        if (!this->isAcceptable(firstToken, { TokenType::Identifier }))
+        {
+            ErrorHandler::error(
+                std::string("Unexpected token: ")
+                    .append(tkom::modules::utils::getTokenTypeName(firstToken.type))
+                    .append(" (Line: ")
+                    .append(std::to_string(firstToken.line))
+                    .append(", Pos: ")
+                    .append(std::to_string(firstToken.pos))
+                    .append(")")
+            );
+        }
+
+        return;
     }
+
+    if (this->peek({ TokenType::ParenthOpen }))
+    {
+        this->accept({ TokenType::ParenthOpen });
+        this->parseExpression();
+        this->accept({ TokenType::ParenthClose });
+
+        return;
+    }
+
+    if (this->peek({ TokenType::Identifier }))
+    {
+        this->parseVariable();
+        return;
+    }
+
+    this->parseLiteral();
+
 }
 
 void Parser::parseCondition()
