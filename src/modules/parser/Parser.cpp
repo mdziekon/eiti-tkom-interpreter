@@ -14,17 +14,21 @@ lexer(lexer)
 
 void Parser::parse()
 {
+    this->tracer.reset();
+
     this->resetPreviousToken();
 
     Token token;
 
     bool finished = false;
 
+    this->tracer.enter("Starting parser tracing...");
     do
     {
         finished = this->parseFunction();
     }
     while(!finished);
+    this->tracer.leave("Trace ended...");
 }
 
 bool Parser::isAcceptable(const Token& token, const std::initializer_list<TokenType>& acceptable) const
@@ -123,6 +127,8 @@ void Parser::resetPreviousToken()
 
 bool Parser::parseFunction()
 {
+    this->tracer.enter("Parsing function");
+
     auto tempToken = this->accept({ TokenType::Function, TokenType::EndOfFile });
     if (tempToken.type == TokenType::EndOfFile)
     {
@@ -133,11 +139,15 @@ bool Parser::parseFunction()
     this->parseParameters();
     this->parseStatementBlock();
 
+    this->tracer.leave();
+
     return true;
 }
 
 void Parser::parseParameters()
 {
+    this->tracer.enter("Parsing parameters");
+
     Token tempToken;
 
     this->accept({ TokenType::ParenthOpen });
@@ -145,6 +155,7 @@ void Parser::parseParameters()
     tempToken = this->accept({ TokenType::ParenthClose, TokenType::Identifier });
     if (tempToken.type == TokenType::ParenthClose)
     {
+        this->tracer.leave();
         return;
     }
 
@@ -153,6 +164,7 @@ void Parser::parseParameters()
         tempToken = this->accept({ TokenType::ParenthClose, TokenType::Comma });
         if (tempToken.type == TokenType::ParenthClose)
         {
+            this->tracer.leave();
             return;
         }
         tempToken = this->accept({ TokenType::Identifier });
@@ -161,6 +173,8 @@ void Parser::parseParameters()
 
 void Parser::parseStatementBlock()
 {
+    this->tracer.enter("Parsing statement block");
+
     this->accept({ TokenType::BracketOpen });
 
     Token tempToken;
@@ -211,10 +225,14 @@ void Parser::parseStatementBlock()
     }
 
     this->accept({ TokenType::BracketClose });
+
+    this->tracer.leave();
 }
 
 void Parser::parseIfStatement()
 {
+    this->tracer.enter("Parsing if statement");
+
     this->accept({ TokenType::If });
 
     this->accept({ TokenType::ParenthOpen });
@@ -225,15 +243,20 @@ void Parser::parseIfStatement()
 
     if (!this->peek({ TokenType::Else }))
     {
+        this->tracer.leave();
         return;
     }
 
     this->accept({ TokenType::Else });
     this->parseStatementBlock();
+
+    this->tracer.leave();
 }
 
 void Parser::parseWhileStatement()
 {
+    this->tracer.enter("Parsing while statement");
+
     this->accept({ TokenType::While });
 
     this->accept({ TokenType::ParenthOpen });
@@ -241,17 +264,25 @@ void Parser::parseWhileStatement()
     this->accept({ TokenType::ParenthClose });
 
     this->parseStatementBlock();
+
+    this->tracer.leave();
 }
 
 void Parser::parseReturnStatement()
 {
+    this->tracer.enter("Parsing return statement");
+
     this->accept({ TokenType::Return });
     this->parseAssignable();
     this->accept({ TokenType::Semicolon });
+
+    this->tracer.leave();
 }
 
 void Parser::parseInitStatement()
 {
+    this->tracer.enter("Parsing init statement");
+
     this->accept({ TokenType::Var });
     this->accept({ TokenType::Identifier });
 
@@ -262,10 +293,14 @@ void Parser::parseInitStatement()
     }
 
     this->accept({ TokenType::Semicolon });
+
+    this->tracer.leave();
 }
 
 void Parser::parseAssignmentOrFunCall()
 {
+    this->tracer.enter("Parsing assignment or function call");
+
     this->accept({ TokenType::Identifier });
 
     if (!this->parseFunCall())
@@ -273,29 +308,40 @@ void Parser::parseAssignmentOrFunCall()
         this->accept({ TokenType::Assignment });
         this->parseAssignable();
     }
+
+    this->tracer.leave();
 }
 
 void Parser::parseAssignable()
 {
+    this->tracer.enter("Parsing assignable");
+
     if (this->peek({ TokenType::Identifier }))
     {
         auto tempToken = this->accept({ TokenType::Identifier });
         if (this->parseFunCall())
         {
+            this->tracer.leave();
             return;
         }
 
         this->parseExpression(tempToken);
+        this->tracer.leave();
         return;
     }
 
     this->parseExpression();
+
+    this->tracer.leave();
 }
 
 bool Parser::parseFunCall()
 {
+    this->tracer.enter("Parsing function call");
+
     if (!this->peek({ TokenType::ParenthOpen }))
     {
+        this->tracer.leave("  - not a function call");
         return false;
     }
 
@@ -304,6 +350,7 @@ bool Parser::parseFunCall()
     if (this->peek({ TokenType::ParenthClose }))
     {
         this->accept({ TokenType::ParenthClose });
+        this->tracer.leave("  + function call");
         return true;
     }
 
@@ -313,6 +360,7 @@ bool Parser::parseFunCall()
         if (this->peek({ TokenType::ParenthClose }))
         {
             this->accept({ TokenType::ParenthClose });
+            this->tracer.leave("  + function call");
             return true;
         }
         if (this->peek({ TokenType::Comma }))
@@ -327,10 +375,13 @@ bool Parser::parseFunCall()
 
 void Parser::parseVariable()
 {
+    this->tracer.enter("Parsing variable");
+
     this->accept({ TokenType::Identifier });
 
     if (!this->peek({ TokenType::SquareBracketOpen }))
     {
+        this->tracer.leave();
         return;
     }
 
@@ -340,19 +391,25 @@ void Parser::parseVariable()
 
     if (!this->peek({ TokenType::SquareBracketOpen }))
     {
+        this->tracer.leave();
         return;
     }
 
     this->accept({ TokenType::SquareBracketOpen });
     this->parseAssignable();
     this->accept({ TokenType::SquareBracketClose });
+
+    this->tracer.leave();
 }
 
 void Parser::parseLiteral()
 {
+    this->tracer.enter("Parsing literal");
+
     if (this->peek({ TokenType::SquareBracketOpen }))
     {
         this->parseMatrixLiteral();
+        this->tracer.leave();
         return;
     }
 
@@ -362,10 +419,14 @@ void Parser::parseLiteral()
     }
 
     this->accept({ TokenType::Infinity, TokenType::NumberLiteral });
+
+    this->tracer.leave();
 }
 
 void Parser::parseMatrixLiteral()
 {
+    this->tracer.enter("Parsing matrix literal");
+
     this->accept({ TokenType::SquareBracketOpen });
     this->accept({ TokenType::NumberLiteral });
 
@@ -379,10 +440,14 @@ void Parser::parseMatrixLiteral()
 
         this->accept({ TokenType::NumberLiteral });
     }
+
+    this->tracer.leave();
 }
 
 void Parser::parseExpression(const Token& firstToken)
 {
+    this->tracer.enter("Parsing expression");
+
     this->parseMultiplicativeExpression(firstToken);
 
     while (this->peek({ TokenType::Plus, TokenType::Minus }))
@@ -390,10 +455,14 @@ void Parser::parseExpression(const Token& firstToken)
         this->accept({ TokenType::Plus, TokenType::Minus });
         this->parseMultiplicativeExpression();
     }
+
+    this->tracer.leave();
 }
 
 void Parser::parseMultiplicativeExpression(const Token& firstToken)
 {
+    this->tracer.enter("Parsing multiplicative expression");
+
     this->parsePrimaryExpression(firstToken);
 
     while (this->peek({ TokenType::Multiply, TokenType::Divide, TokenType::Modulo }))
@@ -401,10 +470,15 @@ void Parser::parseMultiplicativeExpression(const Token& firstToken)
         this->accept({ TokenType::Multiply, TokenType::Divide, TokenType::Modulo });
         this->parsePrimaryExpression();
     }
+
+    this->tracer.leave();
 }
 
 void Parser::parsePrimaryExpression(const Token& firstToken)
 {
+    this->tracer.enter("Parsing primary expression");
+    this->tracer.info(std::string("First Token type = ").append(tkom::modules::utils::getTokenTypeName(firstToken.type)));
+
     if (firstToken.type != TokenType::Undefined)
     {
         if (!this->isAcceptable(firstToken, { TokenType::Identifier }))
@@ -420,6 +494,7 @@ void Parser::parsePrimaryExpression(const Token& firstToken)
             );
         }
 
+        this->tracer.leave();
         return;
     }
 
@@ -429,21 +504,27 @@ void Parser::parsePrimaryExpression(const Token& firstToken)
         this->parseExpression();
         this->accept({ TokenType::ParenthClose });
 
+        this->tracer.leave();
         return;
     }
 
     if (this->peek({ TokenType::Identifier }))
     {
         this->parseVariable();
+
+        this->tracer.leave();
         return;
     }
 
     this->parseLiteral();
 
+    this->tracer.leave();
 }
 
 void Parser::parseCondition()
 {
+    this->tracer.enter("Parsing condition");
+
     this->parseAndCondition();
 
     while (this->peek({ TokenType::Or }))
@@ -451,10 +532,14 @@ void Parser::parseCondition()
         this->accept({ TokenType::Or });
         this->parseAndCondition();
     }
+
+    this->tracer.leave();
 }
 
 void Parser::parseAndCondition()
 {
+    this->tracer.enter("Parsing and condition");
+
     this->parseEqualityCondition();
 
     while (this->peek({ TokenType::And }))
@@ -462,10 +547,14 @@ void Parser::parseAndCondition()
         this->accept({ TokenType::And });
         this->parseEqualityCondition();
     }
+
+    this->tracer.leave();
 }
 
 void Parser::parseEqualityCondition()
 {
+    this->tracer.enter("Parsing equality condition");
+
     this->parseRelationalCondition();
 
     while (this->peek({ TokenType::Equality, TokenType::Inequality }))
@@ -473,10 +562,14 @@ void Parser::parseEqualityCondition()
         this->accept({ TokenType::Equality, TokenType::Inequality });
         this->parseRelationalCondition();
     }
+
+    this->tracer.leave();
 }
 
 void Parser::parseRelationalCondition()
 {
+    this->tracer.enter("Parsing relational condition");
+
     this->parsePrimaryCondition();
 
     while (this->peek({ TokenType::Less, TokenType::Greater, TokenType::LessOrEqual, TokenType::GreaterOrEqual }))
@@ -484,10 +577,14 @@ void Parser::parseRelationalCondition()
         this->accept({ TokenType::Less, TokenType::Greater, TokenType::LessOrEqual, TokenType::GreaterOrEqual });
         this->parsePrimaryCondition();
     }
+
+    this->tracer.leave();
 }
 
 void Parser::parsePrimaryCondition()
 {
+    this->tracer.enter("Parsing primary condition");
+
     if (this->peek({ TokenType::Negation }))
     {
         this->accept({ TokenType::Negation });
@@ -499,6 +596,7 @@ void Parser::parsePrimaryCondition()
         this->parseCondition();
         this->accept({ TokenType::ParenthClose });
 
+        this->tracer.leave();
         return;
     }
 
@@ -506,8 +604,11 @@ void Parser::parsePrimaryCondition()
     {
         this->parseVariable();
 
+        this->tracer.leave();
         return;
     }
 
     this->parseLiteral();
+
+    this->tracer.leave();
 }
