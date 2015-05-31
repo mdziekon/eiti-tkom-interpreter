@@ -8,8 +8,11 @@
 
 #include "../tracer/Tracer.hpp"
 
+#include "../../structures/ast/AST.hpp"
+
 using Token = tkom::modules::utils::Token;
 using TokenType = tkom::modules::utils::TokenType;
+namespace ast = tkom::structures::ast;
 
 namespace tkom { namespace modules
 {
@@ -33,36 +36,39 @@ namespace tkom { namespace modules
         bool peek(const std::initializer_list<TokenType>& acceptable);
         Token getPeeked();
         void peekFail();
+        const std::string makeErrorMarker(const unsigned int& pos);
 
         bool hasBufferedToken() const;
         void resetPreviousToken();
 
         // Decomposition procedures
-        bool parseFunction();
-        void parseParameters();
-        void parseStatementBlock();
+        std::shared_ptr<ast::FunDefinition> parseFunction();
+        std::vector<std::string> parseParameters();
+        std::shared_ptr<ast::StatementBlock> parseStatementBlock();
 
-        void parseIfStatement();
-        void parseWhileStatement();
-        void parseReturnStatement();
-        void parseInitStatement();
-        void parseAssignmentOrFunCall();
+        std::shared_ptr<ast::IfStatement> parseIfStatement();
+        std::shared_ptr<ast::WhileStatement> parseWhileStatement();
+        std::shared_ptr<ast::ReturnStatement> parseReturnStatement();
+        std::shared_ptr<ast::VarDeclaration> parseInitStatement();
+        ast::NodePtr parseAssignmentOrFunCall();
+        std::shared_ptr<ast::LoopJump> parseLoopJump();
 
-        void parseAssignable();
-        bool parseFunCall();
-        void parseVariable();
-        void parseLiteral();
-        void parseMatrixLiteral();
+        std::shared_ptr<ast::Assignable> parseAssignable();
+        std::shared_ptr<ast::Call> parseFunCall(const std::string& identifier);
+        std::shared_ptr<ast::Variable> parseVariable(const Token& firstToken = Token(TokenType::Undefined));
+        std::shared_ptr<ast::Matrix> parseLiteral();
+        double parseNumberLiteral();
+        std::shared_ptr<ast::Matrix> parseMatrixLiteral();
 
-        void parseExpression(const Token& firstToken = Token(TokenType::Undefined));
-        void parseMultiplicativeExpression(const Token& firstToken = Token(TokenType::Undefined));
-        void parsePrimaryExpression(const Token& firstToken = Token(TokenType::Undefined));
+        std::shared_ptr<ast::Expression> parseExpression(const Token& firstToken = Token(TokenType::Undefined));
+        std::shared_ptr<ast::Expression> parseMultiplicativeExpression(const Token& firstToken = Token(TokenType::Undefined));
+        ast::NodePtr parsePrimaryExpression(const Token& firstToken = Token(TokenType::Undefined));
 
-        void parseCondition();
-        void parseAndCondition();
-        void parseEqualityCondition();
-        void parseRelationalCondition();
-        void parsePrimaryCondition();
+        std::shared_ptr<ast::Condition> parseCondition();
+        std::shared_ptr<ast::Condition> parseAndCondition();
+        std::shared_ptr<ast::Condition> parseEqualityCondition();
+        std::shared_ptr<ast::Condition> parseRelationalCondition();
+        ast::NodePtr parsePrimaryCondition();
     };
 }}
 
