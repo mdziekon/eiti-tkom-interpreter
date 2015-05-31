@@ -19,6 +19,7 @@ namespace tkom { namespace modules { namespace utils
 
         unsigned int line = 0;
         unsigned int pos = 0;
+        std::streampos lineStart;
     };
 }}}
 

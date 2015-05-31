@@ -14,6 +14,7 @@ namespace tkom { namespace modules
         Lexer(const std::string& file);
 
         const Token nextToken();
+        const std::string getLine(const std::streampos& linePos);
 
     private:
         tkom::modules::FileReader reader;

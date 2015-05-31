@@ -72,7 +72,12 @@ Token Parser::accept(const std::initializer_list<TokenType>& acceptable)
                 .append(", Pos: ")
                 .append(std::to_string(token.pos))
                 .append(")")
+                .append("\n")
+                .append(this->lexer.getLine(token.lineStart))
+                .append("\n")
+                .append(this->makeErrorMarker(token.pos))
         );
+
         return token;
     }
 }
@@ -109,7 +114,16 @@ void Parser::peekFail()
             .append(", Pos: ")
             .append(std::to_string(token.pos))
             .append(")")
+            .append("\n")
+            .append(this->lexer.getLine(token.lineStart))
+            .append("\n")
+            .append(this->makeErrorMarker(token.pos))
     );
+}
+
+const std::string Parser::makeErrorMarker(const unsigned int& pos)
+{
+    return std::string(pos, ' ').append("^");
 }
 
 bool Parser::hasBufferedToken() const

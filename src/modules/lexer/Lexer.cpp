@@ -23,7 +23,8 @@ const Token Lexer::nextToken()
     }
 
     token.line = this->reader.getCurrentLineNo();
-    token.pos = this->reader.getCurrentSignPos();
+    token.pos = this->reader.getCurrentSignPos() - 1;
+    token.lineStart = this->reader.getCurrentLinePos();
 
     if (this->reader.hasFinished())
     {
@@ -209,4 +210,9 @@ const Token Lexer::nextToken()
     }
 
     return token;
+}
+
+const std::string Lexer::getLine(const std::streampos& linePos)
+{
+    return this->reader.getLine(linePos);
 }
