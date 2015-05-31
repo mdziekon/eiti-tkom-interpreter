@@ -17,6 +17,7 @@ namespace tkom { namespace modules
 
         static const std::string colorize(const std::string& message, const std::string& color);
         static void printLabel(const std::string& message, const std::string& color = "");
+        static const unsigned int getLabelLength(const std::string& message);
     };
 }}
 

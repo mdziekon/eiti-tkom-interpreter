@@ -46,3 +46,9 @@ TerminalPrinter::printLabel(const std::string& message, const std::string& color
     std::cout << TerminalPrinter::colorize(temp.str(), color)
               << " ";
 }
+
+const unsigned int
+TerminalPrinter::getLabelLength(const std::string& message)
+{
+    return message.length() + 3;
+}

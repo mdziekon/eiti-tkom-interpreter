@@ -33,6 +33,8 @@ namespace tkom { namespace modules
         static void error(const std::string& message, const bool& noThrow = false);
         static void warning(const std::string& message);
         static void notice(const std::string& message);
+
+        static void print(const unsigned int& labelShift, const std::string& message);
     };
 }}
 

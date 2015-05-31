@@ -21,7 +21,7 @@ const char* Exception::what() const noexcept
 void ErrorHandler::debugFatal(const std::string& message)
 {
     ErrorHandler::printLabel("Fatal", "magenta");
-    std::cout << message << std::endl;
+    ErrorHandler::print(ErrorHandler::getLabelLength("Fatal"), message);
 
     throw ErrorHandler::Exception(message);
 }
@@ -29,7 +29,7 @@ void ErrorHandler::debugFatal(const std::string& message)
 void ErrorHandler::error(const std::string& message, const bool& noThrow)
 {
     ErrorHandler::printLabel("Error", "red");
-    std::cout << message << std::endl;
+    ErrorHandler::print(ErrorHandler::getLabelLength("Error"), message);
 
     if (noThrow)
     {
@@ -42,11 +42,27 @@ void ErrorHandler::error(const std::string& message, const bool& noThrow)
 void ErrorHandler::warning(const std::string& message)
 {
     ErrorHandler::printLabel("Warn", "yellow");
-    std::cout << message << std::endl;
+    ErrorHandler::print(ErrorHandler::getLabelLength("Warn"), message);
 }
 
 void ErrorHandler::notice(const std::string& message)
 {
     ErrorHandler::printLabel("Note", "cyan");
-    std::cout << message << std::endl;
+    ErrorHandler::print(ErrorHandler::getLabelLength("Note"), message);
+}
+
+void ErrorHandler::print(const unsigned int& labelShift, const std::string& message)
+{
+    std::stringstream messageStream;
+    messageStream << message;
+
+    std::string line;
+
+    std::getline(messageStream, line);
+    std::cout << line << std::endl;
+
+    while (std::getline(messageStream, line))
+    {
+        std::cout << std::string(labelShift, ' ') << line << std::endl;
+    }
 }
