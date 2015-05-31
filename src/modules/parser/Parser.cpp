@@ -13,7 +13,7 @@ Parser::Parser(Lexer& lexer):
 lexer(lexer)
 {}
 
-void Parser::parse()
+std::shared_ptr<ast::Program> Parser::parse()
 {
     this->tracer.reset();
 
@@ -30,6 +30,8 @@ void Parser::parse()
         syntaxTree->addFunction(lastFunction);
     }
     this->tracer.leave("Trace ended...");
+
+    return syntaxTree;
 }
 
 bool Parser::isAcceptable(const Token& token, const std::initializer_list<TokenType>& acceptable) const

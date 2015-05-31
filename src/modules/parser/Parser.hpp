@@ -23,7 +23,7 @@ namespace tkom { namespace modules
     public:
         Parser(Lexer& lexer);
 
-        void parse();
+        std::shared_ptr<ast::Program> parse();
 
     private:
         Tracer tracer = Tracer(true);
