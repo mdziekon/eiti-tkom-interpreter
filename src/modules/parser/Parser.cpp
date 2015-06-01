@@ -601,14 +601,14 @@ std::shared_ptr<ast::Expression> Parser::parseExpression(const Token& firstToken
 
     this->tracer.enter("Parsing expression");
 
-    node->setLeftSide(this->parseMultiplicativeExpression(firstToken));
+    node->addOperand(this->parseMultiplicativeExpression(firstToken));
 
     while (this->peek({ TokenType::Plus, TokenType::Minus }))
     {
         auto tempToken = this->accept({ TokenType::Plus, TokenType::Minus });
         node->setOperator(tempToken.type);
 
-        node->setRightSide(this->parseMultiplicativeExpression());
+        node->addOperand(this->parseMultiplicativeExpression());
     }
 
     this->tracer.leave();
@@ -621,14 +621,14 @@ std::shared_ptr<ast::Expression> Parser::parseMultiplicativeExpression(const Tok
 
     this->tracer.enter("Parsing multiplicative expression");
 
-    node->setLeftSide(this->parsePrimaryExpression(firstToken));
+    node->addOperand(this->parsePrimaryExpression(firstToken));
 
     while (this->peek({ TokenType::Multiply, TokenType::Divide, TokenType::Modulo }))
     {
         auto tempToken = this->accept({ TokenType::Multiply, TokenType::Divide, TokenType::Modulo });
         node->setOperator(tempToken.type);
 
-        node->setRightSide(this->parsePrimaryExpression());
+        node->addOperand(this->parsePrimaryExpression());
     }
 
     this->tracer.leave();
@@ -678,14 +678,14 @@ std::shared_ptr<ast::Condition> Parser::parseCondition()
 
     this->tracer.enter("Parsing condition");
 
-    node->setLeftSide(this->parseAndCondition());
+    node->addOperand(this->parseAndCondition());
 
     while (this->peek({ TokenType::Or }))
     {
         this->accept({ TokenType::Or });
         node->setOperator(TokenType::Or);
 
-        node->setRightSide(this->parseAndCondition());
+        node->addOperand(this->parseAndCondition());
     }
 
     this->tracer.leave();
@@ -698,14 +698,14 @@ std::shared_ptr<ast::Condition> Parser::parseAndCondition()
 
     this->tracer.enter("Parsing and condition");
 
-    node->setLeftSide(this->parseEqualityCondition());
+    node->addOperand(this->parseEqualityCondition());
 
     while (this->peek({ TokenType::And }))
     {
         this->accept({ TokenType::And });
         node->setOperator(TokenType::And);
 
-        node->setRightSide(this->parseEqualityCondition());
+        node->addOperand(this->parseEqualityCondition());
     }
 
     this->tracer.leave();
@@ -718,14 +718,14 @@ std::shared_ptr<ast::Condition> Parser::parseEqualityCondition()
 
     this->tracer.enter("Parsing equality condition");
 
-    node->setLeftSide(this->parseRelationalCondition());
+    node->addOperand(this->parseRelationalCondition());
 
     while (this->peek({ TokenType::Equality, TokenType::Inequality }))
     {
         auto tempToken = this->accept({ TokenType::Equality, TokenType::Inequality });
         node->setOperator(tempToken.type);
 
-        node->setRightSide(this->parseRelationalCondition());
+        node->addOperand(this->parseRelationalCondition());
     }
 
     this->tracer.leave();
@@ -738,14 +738,14 @@ std::shared_ptr<ast::Condition> Parser::parseRelationalCondition()
 
     this->tracer.enter("Parsing relational condition");
 
-    node->setLeftSide(this->parsePrimaryCondition());
+    node->addOperand(this->parsePrimaryCondition());
 
     while (this->peek({ TokenType::Less, TokenType::Greater, TokenType::LessOrEqual, TokenType::GreaterOrEqual }))
     {
         auto tempToken = this->accept({ TokenType::Less, TokenType::Greater, TokenType::LessOrEqual, TokenType::GreaterOrEqual });
         node->setOperator(tempToken.type);
 
-        node->setRightSide(this->parsePrimaryCondition());
+        node->addOperand(this->parsePrimaryCondition());
     }
 
     this->tracer.leave();
@@ -768,18 +768,18 @@ ast::NodePtr Parser::parsePrimaryCondition()
     if (this->peek({ TokenType::ParenthOpen }))
     {
         this->accept({ TokenType::ParenthOpen });
-        node->setLeftSide(this->parseCondition());
+        node->addOperand(this->parseCondition());
         this->accept({ TokenType::ParenthClose });
     }
     else
     {
         if (this->peek({ TokenType::Identifier }))
         {
-            node->setLeftSide(this->parseVariable());
+            node->addOperand(this->parseVariable());
         }
         else
         {
-            node->setLeftSide(this->parseLiteral());
+            node->addOperand(this->parseLiteral());
         }
     }
 

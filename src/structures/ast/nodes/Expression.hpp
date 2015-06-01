@@ -10,13 +10,9 @@ namespace tkom { namespace structures { namespace ast
     class Expression: public Assignable
     {
     public:
-        void setLeftSide(const ast::NodePtr& node)
+        void addOperand(const ast::NodePtr& node)
         {
-            this->leftNode = node;
-        }
-        void setRightSide(const ast::NodePtr& node)
-        {
-            this->rightNode = node;
+            this->operands.push_back(node);
         }
         void setOperator(const TokenType& operation)
         {
@@ -24,9 +20,8 @@ namespace tkom { namespace structures { namespace ast
         }
 
     private:
-        ast::NodePtr leftNode;
-        ast::NodePtr rightNode;
         TokenType operation;
+        std::vector<ast::NodePtr> operands;
     };
 }}}
 
