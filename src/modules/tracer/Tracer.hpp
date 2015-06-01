@@ -15,7 +15,7 @@ namespace tkom { namespace modules
         void reset();
 
         void enter(const std::string& message = "");
-        void leave(const std::string& message = "");
+        void leave(const std::string& message = "leave");
         void info(const std::string& message);
 
     private:
