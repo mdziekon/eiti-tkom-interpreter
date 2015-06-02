@@ -156,6 +156,7 @@ std::shared_ptr<ast::FunDefinition> Parser::parseFunction()
     }
 
     tempToken = this->accept({ TokenType::Identifier });
+    node->setName(tempToken.value);
     node->setParameters(this->parseParameters());
     node->setBlock(this->parseStatementBlock());
 

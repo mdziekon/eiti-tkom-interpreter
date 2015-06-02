@@ -15,7 +15,11 @@ namespace tkom { namespace structures { namespace ast
     class FunDefinition: public Node
     {
     public:
-        void setParameters(const std::vector<std::string> parameters)
+        void setName(const std::string& name)
+        {
+            this->name = name;
+        }
+        void setParameters(const std::vector<std::string>& parameters)
         {
             this->parameters = parameters;
         }
@@ -28,6 +32,7 @@ namespace tkom { namespace structures { namespace ast
             return Node::Type::FunDefinition;
         }
 
+        std::string name;
         std::vector<std::string> parameters;
         std::shared_ptr<StatementBlock> blockNode;
     };
