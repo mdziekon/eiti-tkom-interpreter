@@ -32,3 +32,5 @@
 # Scons
 .sconsign.dblite
 build
+
+.tags*
