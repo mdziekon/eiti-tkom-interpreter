@@ -19,8 +19,11 @@ namespace tkom { namespace structures { namespace ast
             this->data.push_back({});
             this->currentLevel++;
         }
+        virtual Type getType()
+        {
+            return Node::Type::Matrix;
+        }
 
-    private:
         unsigned int currentLevel = 0;
         std::vector<std::vector<double>> data = {{}};
     };

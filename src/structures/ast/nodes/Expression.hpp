@@ -18,8 +18,11 @@ namespace tkom { namespace structures { namespace ast
         {
             this->operation = operation;
         }
+        virtual Type getType()
+        {
+            return Node::Type::Expression;
+        }
 
-    private:
         TokenType operation;
         std::vector<ast::NodePtr> operands;
     };

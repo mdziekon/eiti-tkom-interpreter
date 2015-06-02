@@ -17,8 +17,11 @@ namespace tkom { namespace structures { namespace ast
         {
             this->functions.push_back(function);
         }
+        virtual Type getType()
+        {
+            return Node::Type::Program;
+        }
 
-    private:
         std::vector<std::shared_ptr<FunDefinition>> functions = {};
     };
 }}}

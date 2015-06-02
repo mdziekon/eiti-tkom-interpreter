@@ -18,8 +18,11 @@ namespace tkom { namespace structures { namespace ast
         {
             this->assignableNode = assignableNode;
         }
+        virtual Type getType()
+        {
+            return Node::Type::VarDeclaration;
+        }
 
-    private:
         std::string name;
         std::shared_ptr<Assignable> assignableNode;
     };

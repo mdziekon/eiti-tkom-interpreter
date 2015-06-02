@@ -23,8 +23,11 @@ namespace tkom { namespace structures { namespace ast
         {
             this->blockNode = blockNode;
         }
+        virtual Type getType()
+        {
+            return Node::Type::FunDefinition;
+        }
 
-    private:
         std::vector<std::string> parameters;
         std::shared_ptr<StatementBlock> blockNode;
     };

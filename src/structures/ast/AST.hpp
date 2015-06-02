@@ -11,8 +11,24 @@ namespace tkom { namespace structures { namespace ast
         std::weak_ptr<Node> parent;
 
     public:
-        virtual void execute()
-        {};
+        enum class Type {
+            Assignment,
+            Call,
+            Condition,
+            Expression,
+            FunDefinition,
+            IfStatement,
+            LoopJump,
+            Matrix,
+            Program,
+            ReturnStatement,
+            StatementBlock,
+            VarDeclaration,
+            Variable,
+            WhileStatement
+        };
+
+        virtual Type getType() = 0;
     };
 
     typedef std::shared_ptr<Node> NodePtr;

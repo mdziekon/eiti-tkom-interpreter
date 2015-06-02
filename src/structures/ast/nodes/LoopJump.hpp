@@ -19,8 +19,11 @@ namespace tkom { namespace structures { namespace ast
             }
             this->isBreak = false;
         }
+        virtual Type getType()
+        {
+            return Node::Type::LoopJump;
+        }
 
-    private:
         bool isBreak;
     };
 }}}

@@ -18,8 +18,11 @@ namespace tkom { namespace structures { namespace ast
         {
             this->blockNode = blockNode;
         }
+        virtual Type getType()
+        {
+            return Node::Type::WhileStatement;
+        }
 
-    private:
         std::shared_ptr<Condition> conditionNode;
         std::shared_ptr<StatementBlock> blockNode;
     };

@@ -24,8 +24,11 @@ namespace tkom { namespace structures { namespace ast
         {
             this->falseBlockNode = falseBlockNode;
         }
+        virtual Type getType()
+        {
+            return Node::Type::IfStatement;
+        }
 
-    private:
         std::shared_ptr<Condition> conditionNode;
         std::shared_ptr<StatementBlock> trueBlockNode;
         std::shared_ptr<StatementBlock> falseBlockNode;

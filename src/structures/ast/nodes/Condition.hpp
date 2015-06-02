@@ -33,7 +33,11 @@ namespace tkom { namespace structures { namespace ast
             return this->operands.at(0);
         }
 
-    private:
+        virtual Type getType()
+        {
+            return Node::Type::Condition;
+        }
+
         bool negated = false;
         TokenType operation;
         std::vector<ast::NodePtr> operands;

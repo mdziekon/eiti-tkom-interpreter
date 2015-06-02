@@ -16,8 +16,11 @@ namespace tkom { namespace structures { namespace ast
         {
             this->instructions.push_back(node);
         }
+        virtual Type getType()
+        {
+            return Node::Type::StatementBlock;
+        }
 
-    private:
         std::vector<ast::NodePtr> instructions;
     };
 }}}

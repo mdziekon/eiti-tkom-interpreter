@@ -22,7 +22,11 @@ namespace tkom { namespace structures { namespace ast
             this->value = value;
         }
 
-    private:
+        virtual Type getType()
+        {
+            return Node::Type::Assignment;
+        }
+
         std::shared_ptr<Variable> variable;
         std::shared_ptr<Assignable> value;
     };

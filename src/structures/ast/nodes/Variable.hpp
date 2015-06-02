@@ -33,8 +33,11 @@ namespace tkom { namespace structures { namespace ast
                 // error
             }
         }
+        virtual Type getType()
+        {
+            return Node::Type::Variable;
+        }
 
-    private:
         std::string variableName;
         std::shared_ptr<Assignable> indexArg1;
         std::shared_ptr<Assignable> indexArg2;

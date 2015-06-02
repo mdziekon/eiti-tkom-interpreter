@@ -19,8 +19,11 @@ namespace tkom { namespace structures { namespace ast
         {
             this->arguments.push_back(assignableNode);
         }
+        virtual Type getType()
+        {
+            return Node::Type::Call;
+        }
 
-    private:
         std::string name;
         std::vector<std::shared_ptr<Assignable>> arguments;
     };
