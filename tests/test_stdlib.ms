@@ -10,13 +10,20 @@ function myPrint(x)
     printEmpty();
     print(size(generate(2, 11, 2)));
 
-    return 1;
+    return x;
 }
 
 function main()
 {
     var abc = [1,2];
-    myPrint(abc);
+    if (!abc)
+    {
+        printEmpty();
+    }
+    else
+    {
+        print(myPrint(abc));
+    }
 
     return 1;
 }
