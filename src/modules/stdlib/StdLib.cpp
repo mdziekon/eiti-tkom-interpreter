@@ -4,6 +4,10 @@
 
 using StdLib = tkom::modules::StdLib;
 
+#include <limits>
+#include "../../modules/error-handler/ErrorHandler.hpp"
+using ErrorHandler = tkom::modules::ErrorHandler;
+
 const std::unordered_map<std::string, std::pair<unsigned int, StdLib::StdFun>>&
 StdLib::getStandardFunctions()
 {
@@ -51,6 +55,37 @@ StdLib::funGenerate(ArgVec& arguments)
     // arg[2] - filling
 
     // Check variables
+    if (arguments.at(0)->getSize() != std::make_pair<unsigned int, unsigned int>(1, 1))
+    {
+        ErrorHandler::error(
+            std::string("Cannot call index access using matrix")
+        );
+    }
+    if (arguments.at(1)->getSize() != std::make_pair<unsigned int, unsigned int>(1, 1))
+    {
+        ErrorHandler::error(
+            std::string("Cannot call index access using matrix")
+        );
+    }
+    if (arguments.at(2)->getSize() != std::make_pair<unsigned int, unsigned int>(1, 1))
+    {
+        ErrorHandler::error(
+            std::string("Cannot fill matrix using other matrix")
+        );
+    }
+
+    if (arguments.at(0)->data.at(0).at(0) <= 0 || arguments.at(0)->data.at(0).at(0) == std::numeric_limits<double>::infinity())
+    {
+        ErrorHandler::error(
+            std::string("Invalid width argument")
+        );
+    }
+    if (arguments.at(1)->data.at(0).at(0) <= 0 || arguments.at(1)->data.at(0).at(0) == std::numeric_limits<double>::infinity())
+    {
+        ErrorHandler::error(
+            std::string("Invalid height argument")
+        );
+    }
 
     auto result = std::make_shared<Literal>();
     result->data.clear();
@@ -74,6 +109,37 @@ StdLib::funResize(ArgVec& arguments)
     // arg[3] - filling
 
     // Check variables
+    if (arguments.at(1)->getSize() != std::make_pair<unsigned int, unsigned int>(1, 1))
+    {
+        ErrorHandler::error(
+            std::string("Cannot call index access using matrix")
+        );
+    }
+    if (arguments.at(2)->getSize() != std::make_pair<unsigned int, unsigned int>(1, 1))
+    {
+        ErrorHandler::error(
+            std::string("Cannot call index access using matrix")
+        );
+    }
+    if (arguments.at(3)->getSize() != std::make_pair<unsigned int, unsigned int>(1, 1))
+    {
+        ErrorHandler::error(
+            std::string("Cannot fill matrix using other matrix")
+        );
+    }
+
+    if (arguments.at(1)->data.at(0).at(0) <= 0 || arguments.at(1)->data.at(0).at(0) == std::numeric_limits<double>::infinity())
+    {
+        ErrorHandler::error(
+            std::string("Invalid width argument")
+        );
+    }
+    if (arguments.at(2)->data.at(0).at(0) <= 0 || arguments.at(2)->data.at(0).at(0) == std::numeric_limits<double>::infinity())
+    {
+        ErrorHandler::error(
+            std::string("Invalid height argument")
+        );
+    }
 
     auto prevSize = arguments.at(0)->getSize();
 
@@ -101,8 +167,6 @@ std::shared_ptr<Literal>
 StdLib::funSize(ArgVec& arguments)
 {
     // arg[0] - matrix
-
-    // Check variables
 
     auto size = arguments.at(0)->getSize();
 
