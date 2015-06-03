@@ -248,6 +248,8 @@ std::shared_ptr<ast::StatementBlock> Parser::parseStatementBlock()
             case TokenType::Break:
                 node->addInstruction(this->parseLoopJump());
                 break;
+            default:
+                break;
         }
     }
 
