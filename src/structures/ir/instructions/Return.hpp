@@ -15,10 +15,17 @@ namespace tkom { namespace structures { namespace ir { namespace instructions
     {
         std::shared_ptr<ir::Assignable> value;
 
-        virtual std::shared_ptr<Literal> execute(ScopeInst& scope)
+        virtual std::shared_ptr<Literal> execute(
+            ScopeInst* scope,
+            std::unordered_map<std::string, std::shared_ptr<Function>>& functions
+        )
         {
-            // FIXME: return value
-            return nullptr;
+            return this->value->execute(scope, functions);
+        }
+
+        virtual bool canDoReturn()
+        {
+            return true;
         }
     };
 }}}}

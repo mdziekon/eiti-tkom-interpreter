@@ -11,9 +11,8 @@ using StdLib = tkom::modules::StdLib;
 namespace ir = tkom::structures::ir;
 namespace ast = tkom::structures::ast;
 
-std::vector<std::shared_ptr<ir::Function>> SemCheck::check(const std::shared_ptr<ast::Program>& syntaxTree, tkom::modules::Executor& executor)
+std::vector<std::shared_ptr<ir::Function>> SemCheck::check(const std::shared_ptr<ast::Program>& syntaxTree)
 {
-    this->executor = &executor;
     this->syntaxTree = syntaxTree.get();
     this->definedFunctions.clear();
 
@@ -47,6 +46,7 @@ void SemCheck::scanFunctionDefinitions()
 
         this->definedFunctions.insert({ { functionNode->name, std::make_shared<ir::Function>() } });
         auto& fun = this->definedFunctions.at(functionNode->name);
+        fun->name = functionNode->name;
 
         for(auto& variable: functionNode->parameters)
         {
@@ -73,6 +73,14 @@ void SemCheck::checkMain()
         ErrorHandler::error(
             std::string("No entry point (a.k.a. \"main\" function) defined")
         );
+        return;
+    }
+    if (this->definedFunctions.at("main")->scopeProto.variables.size() != 0)
+    {
+        ErrorHandler::error(
+            std::string("\"main\" function should not have parameters")
+        );
+        return;
     }
 }
 
@@ -90,7 +98,6 @@ std::vector<std::shared_ptr<ir::Function>> SemCheck::traverseTree()
 
 std::shared_ptr<ir::Function> SemCheck::checkFunction(ast::FunDefinition& functionDef)
 {
-    // FIXME: Check "no return statement" errors
     auto& function = this->definedFunctions.at(functionDef.name);
 
     function->instructions.push_back(this->checkBlock(function->scopeProto, *(functionDef.blockNode)));
@@ -107,7 +114,6 @@ std::shared_ptr<ir::Block> SemCheck::checkBlock(ir::ScopeProto& scopeProto, ast:
     {
         switch(instruction->getType())
         {
-            // FIXME: Handle break/continue nodes
             case ast::Node::Type::VarDeclaration:
             {
                 auto node = static_cast<ast::VarDeclaration*>(instruction.get());
@@ -127,7 +133,6 @@ std::shared_ptr<ir::Block> SemCheck::checkBlock(ir::ScopeProto& scopeProto, ast:
             }
             case ast::Node::Type::ReturnStatement:
             {
-                // FIXME: Keep track of call to be "terminated" in this return
                 auto node = static_cast<ast::ReturnStatement*>(instruction.get());
                 block->instructions.push_back(this->checkReturnStatement(block->scopeProto, *(node->assignableNode)));
                 break;
@@ -154,6 +159,13 @@ std::shared_ptr<ir::Block> SemCheck::checkBlock(ir::ScopeProto& scopeProto, ast:
             {
                 auto node = static_cast<ast::WhileStatement*>(instruction.get());
                 block->instructions.push_back(this->checkWhileStatement(block->scopeProto, *node));
+                break;
+            }
+            case ast::Node::Type::LoopJump:
+            {
+                auto node = std::make_shared<ir::instructions::LoopJump>();
+                node->isBreak = (static_cast<ast::LoopJump*>(instruction.get()))->isBreak;
+                block->instructions.push_back(node);
                 break;
             }
             default:
@@ -193,7 +205,7 @@ std::shared_ptr<ir::instructions::Assignment> SemCheck::checkAssignment(ir::Scop
         return nullptr;
     }
 
-    node->variable = variable;
+    node->variable->name = variable;
     node->value = this->checkAssignable(scopeProto, assignable);
 
     scopeProto.setVariableDefined(variable);
@@ -226,7 +238,41 @@ std::shared_ptr<ir::instructions::Assignment> SemCheck::checkAssignment(ir::Scop
         return nullptr;
     }
 
-    node->variable = variable.variableName;
+    node->variable->name = variable.variableName;
+    if (variable.indexArg1)
+    {
+        if (variable.indexArg1->getType() == ast::Node::Type::Call)
+        {
+            node->variable->indexArg1 = this->checkFunctionCall(scopeProto, *(static_cast<ast::Call*>(variable.indexArg1.get())));
+        }
+        else if (variable.indexArg1->getType() == ast::Node::Type::Expression)
+        {
+            node->variable->indexArg1 = this->checkExpression(scopeProto, *(static_cast<ast::Expression*>(variable.indexArg1.get())));
+        }
+        else
+        {
+            ErrorHandler::error(
+                std::string("Invalid assignable value")
+            );
+        }
+    }
+    if (variable.indexArg2)
+    {
+        if (variable.indexArg2->getType() == ast::Node::Type::Call)
+        {
+            node->variable->indexArg2 = this->checkFunctionCall(scopeProto, *(static_cast<ast::Call*>(variable.indexArg2.get())));
+        }
+        else if (variable.indexArg2->getType() == ast::Node::Type::Expression)
+        {
+            node->variable->indexArg2 = this->checkExpression(scopeProto, *(static_cast<ast::Expression*>(variable.indexArg2.get())));
+        }
+        else
+        {
+            ErrorHandler::error(
+                std::string("Invalid assignable value")
+            );
+        }
+    }
     node->value = this->checkAssignable(scopeProto, assignable);
 
     scopeProto.setVariableDefined(variable.variableName);
@@ -254,7 +300,7 @@ std::shared_ptr<ir::Assignable> SemCheck::checkAssignable(ir::ScopeProto& scopeP
 
 std::shared_ptr<ir::instructions::Call> SemCheck::checkFunctionCall(ir::ScopeProto& scopeProto, ast::Call& call)
 {
-    if (this->definedFunctions.count(call.name) == 0)
+    if (this->definedFunctions.count(call.name) == 0 && !StdLib::hasFunction(call.name))
     {
         ErrorHandler::error(
             std::string("Call to undefined function: ")
@@ -263,21 +309,41 @@ std::shared_ptr<ir::instructions::Call> SemCheck::checkFunctionCall(ir::ScopePro
         return nullptr;
     }
 
-    auto &functionDef = this->definedFunctions.at(call.name);
-    if (functionDef->scopeProto.variables.size() != call.arguments.size())
+    if (this->definedFunctions.count(call.name) == 1)
     {
-        ErrorHandler::error(
-            std::string("Invalid arguments count for function \"")
-                .append(call.name)
-                .append("\", expected ")
-                .append(std::to_string(functionDef->scopeProto.variables.size()))
-                .append(", got ")
-                .append(std::to_string(call.arguments.size()))
-        );
-        return nullptr;
+        auto &functionDef = this->definedFunctions.at(call.name);
+        if (functionDef->scopeProto.variables.size() != call.arguments.size())
+        {
+            ErrorHandler::error(
+                std::string("Invalid arguments count for function \"")
+                    .append(call.name)
+                    .append("\", expected ")
+                    .append(std::to_string(functionDef->scopeProto.variables.size()))
+                    .append(", got ")
+                    .append(std::to_string(call.arguments.size()))
+            );
+            return nullptr;
+        }
+    }
+    else
+    {
+        unsigned int requiredArgs = StdLib::getFunctionParamsCount(call.name);
+        if (requiredArgs != call.arguments.size())
+        {
+            ErrorHandler::error(
+                std::string("Invalid arguments count for function \"")
+                    .append(call.name)
+                    .append("\", expected ")
+                    .append(std::to_string(requiredArgs))
+                    .append(", got ")
+                    .append(std::to_string(call.arguments.size()))
+            );
+            return nullptr;
+        }
     }
 
     std::shared_ptr<ir::instructions::Call> obj = std::make_shared<ir::instructions::Call>();
+    obj->name = call.name;
 
     for(auto& argument: call.arguments)
     {
@@ -291,7 +357,7 @@ std::shared_ptr<ir::Expression> SemCheck::checkExpression(ir::ScopeProto& scopeP
 {
     std::shared_ptr<ir::Expression> obj = std::make_shared<ir::Expression>();
 
-    obj->operation = expression.operation;
+    obj->operations = expression.operations;
 
     for(auto& operand: expression.operands)
     {
@@ -411,7 +477,7 @@ std::shared_ptr<ir::Condition> SemCheck::checkCondition(ir::ScopeProto& scopePro
     {
         if (operand->getType() == ast::Node::Type::Matrix)
         {
-            obj->operands.push_back(std::make_shared<ir::Literal>());
+            obj->operands.push_back(this->checkMatrixLiteral(*(static_cast<ast::Matrix*>(operand.get()))));
         }
         else if (operand->getType() == ast::Node::Type::Condition)
         {

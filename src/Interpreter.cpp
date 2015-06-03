@@ -28,9 +28,10 @@ Interpreter::Interpreter(const std::vector<std::string>& arguments)
         Executor executor;
 
         auto syntaxTree = parser.parse();
-        auto checkResult = semCheck.check(syntaxTree, executor);
+        auto checkResult = semCheck.check(syntaxTree);
 
-        std::cout << "Result: " << checkResult.size() << std::endl;
+        executor.execute(checkResult);
+
     }
     catch(ErrorHandler::Exception &e)
     {

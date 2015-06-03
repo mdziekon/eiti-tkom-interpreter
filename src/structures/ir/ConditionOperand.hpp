@@ -6,7 +6,12 @@
 namespace tkom { namespace structures { namespace ir
 {
     struct ConditionOperand: virtual public Executable
-    {};
+    {
+        virtual bool isTruthy()
+        {
+            return false;
+        }
+    };
 }}}
 
 #endif

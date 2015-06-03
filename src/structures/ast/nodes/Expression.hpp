@@ -14,16 +14,16 @@ namespace tkom { namespace structures { namespace ast
         {
             this->operands.push_back(node);
         }
-        void setOperator(const TokenType& operation)
+        void addOperator(const TokenType& operation)
         {
-            this->operation = operation;
+            this->operations.push_back(operation);
         }
         virtual Type getType()
         {
             return Node::Type::Expression;
         }
 
-        TokenType operation;
+        std::vector<TokenType> operations;
         std::vector<ast::NodePtr> operands;
     };
 }}}

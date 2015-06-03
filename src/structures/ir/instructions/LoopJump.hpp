@@ -3,6 +3,7 @@
 
 #include "../Instruction.hpp"
 #include "../Executable.hpp"
+#include <iostream>
 
 namespace ir = tkom::structures::ir;
 
@@ -12,10 +13,16 @@ namespace tkom { namespace structures { namespace ir { namespace instructions
     {
         bool isBreak;
 
-        virtual std::shared_ptr<Literal> execute(ScopeInst& scope)
+        virtual std::shared_ptr<Literal> execute(
+            ScopeInst* scope,
+            std::unordered_map<std::string, std::shared_ptr<Function>>& functions
+        )
         {
-            // FIXME: Jump out of the loop
-            return nullptr;
+            auto result = std::make_shared<ir::Literal>();
+            result->loopJump = true;
+            result->isBreak = this->isBreak;
+
+            return result;
         }
     };
 }}}}

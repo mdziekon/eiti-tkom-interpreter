@@ -26,7 +26,7 @@ namespace tkom { namespace modules
         std::shared_ptr<ast::Program> parse();
 
     private:
-        Tracer tracer = Tracer(true);
+        Tracer tracer = Tracer(false);
 
         Lexer& lexer;
         Token previousToken;

@@ -2,7 +2,6 @@
 #define TKOM_MODULES_SEMCHECK_HPP
 
 #include "../parser/Parser.hpp"
-#include "../executor/Executor.hpp"
 #include "../../structures/ir/includes.hpp"
 
 namespace ir = tkom::structures::ir;
@@ -12,10 +11,9 @@ namespace tkom { namespace modules {
     class SemCheck
     {
     public:
-        std::vector<std::shared_ptr<ir::Function>> check(const std::shared_ptr<ast::Program>& syntaxTree, tkom::modules::Executor& executor);
+        std::vector<std::shared_ptr<ir::Function>> check(const std::shared_ptr<ast::Program>& syntaxTree);
 
     private:
-        tkom::modules::Executor* executor;
         ast::Program* syntaxTree;
         std::unordered_map<std::string, std::shared_ptr<ir::Function>> definedFunctions;
 

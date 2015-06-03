@@ -607,7 +607,7 @@ std::shared_ptr<ast::Expression> Parser::parseExpression(const Token& firstToken
     while (this->peek({ TokenType::Plus, TokenType::Minus }))
     {
         auto tempToken = this->accept({ TokenType::Plus, TokenType::Minus });
-        node->setOperator(tempToken.type);
+        node->addOperator(tempToken.type);
 
         node->addOperand(this->parseMultiplicativeExpression());
     }
@@ -627,7 +627,7 @@ std::shared_ptr<ast::Expression> Parser::parseMultiplicativeExpression(const Tok
     while (this->peek({ TokenType::Multiply, TokenType::Divide, TokenType::Modulo }))
     {
         auto tempToken = this->accept({ TokenType::Multiply, TokenType::Divide, TokenType::Modulo });
-        node->setOperator(tempToken.type);
+        node->addOperator(tempToken.type);
 
         node->addOperand(this->parsePrimaryExpression());
     }
@@ -721,7 +721,7 @@ std::shared_ptr<ast::Condition> Parser::parseEqualityCondition()
 
     node->addOperand(this->parseRelationalCondition());
 
-    while (this->peek({ TokenType::Equality, TokenType::Inequality }))
+    if (this->peek({ TokenType::Equality, TokenType::Inequality }))
     {
         auto tempToken = this->accept({ TokenType::Equality, TokenType::Inequality });
         node->setOperator(tempToken.type);
@@ -741,7 +741,7 @@ std::shared_ptr<ast::Condition> Parser::parseRelationalCondition()
 
     node->addOperand(this->parsePrimaryCondition());
 
-    while (this->peek({ TokenType::Less, TokenType::Greater, TokenType::LessOrEqual, TokenType::GreaterOrEqual }))
+    if (this->peek({ TokenType::Less, TokenType::Greater, TokenType::LessOrEqual, TokenType::GreaterOrEqual }))
     {
         auto tempToken = this->accept({ TokenType::Less, TokenType::Greater, TokenType::LessOrEqual, TokenType::GreaterOrEqual });
         node->setOperator(tempToken.type);

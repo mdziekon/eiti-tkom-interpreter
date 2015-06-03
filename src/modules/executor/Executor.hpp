@@ -3,16 +3,16 @@
 
 #include <unordered_map>
 #include <string>
+#include "../../structures/ir/Function.hpp"
+
+namespace ir = tkom::structures::ir;
 
 namespace tkom { namespace modules
 {
     class Executor
     {
     public:
-        bool addFunction(const std::string& name);
-
-    private:
-        std::unordered_map<std::string, bool> definedFunctions;
+        void execute(const std::vector<std::shared_ptr<ir::Function>>& functions);
     };
 }}
 

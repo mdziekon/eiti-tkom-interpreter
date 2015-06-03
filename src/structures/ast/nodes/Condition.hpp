@@ -39,7 +39,7 @@ namespace tkom { namespace structures { namespace ast
         }
 
         bool negated = false;
-        TokenType operation;
+        TokenType operation = TokenType::Undefined;
         std::vector<ast::NodePtr> operands;
     };
 }}}

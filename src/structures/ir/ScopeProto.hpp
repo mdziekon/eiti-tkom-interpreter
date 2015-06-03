@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include <string>
 #include <memory>
+#include <vector>
 
 #include "ScopeInst.hpp"
 
@@ -13,6 +14,7 @@ namespace tkom { namespace structures { namespace ir
     {
         ScopeProto* upperScope = nullptr;
         std::unordered_map<std::string, bool> variables;
+        std::vector<std::string> varOrder;
 
         bool addVariable(const std::string& name)
         {
@@ -21,6 +23,7 @@ namespace tkom { namespace structures { namespace ir
                 return false;
             }
             this->variables.insert({ { name, false } });
+            this->varOrder.push_back(name);
             return true;
         }
 
@@ -73,10 +76,11 @@ namespace tkom { namespace structures { namespace ir
         {
             auto instance = ScopeInst();
             instance.upperScope = upperScope;
+            instance.varOrder = this->varOrder;
 
             for(auto& it: this->variables)
             {
-                instance.variables.insert({ { it.first, Literal() } });
+                instance.variables.insert({ { it.first, std::make_shared<Literal>() } });
             }
 
             return instance;

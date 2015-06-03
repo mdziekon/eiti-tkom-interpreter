@@ -1,15 +1,29 @@
 #include "Executor.hpp"
 
-using Executor = tkom::modules::Executor;
+#include "../stdlib/StdLib.hpp"
 
-bool Executor::addFunction(const std::string& name)
+using Executor = tkom::modules::Executor;
+using StdLib = tkom::modules::StdLib;
+
+void Executor::execute(const std::vector<std::shared_ptr<ir::Function>>& functions)
 {
-    if (this->definedFunctions.count(name) == 1)
+    std::unordered_map<std::string, std::shared_ptr<ir::Function>> definedFunctions;
+    for(auto& it: functions)
     {
-        return false;
+        definedFunctions.insert({ { it->name, it } });
     }
 
-    this->definedFunctions.insert({ { name, true } });
+    auto& main = definedFunctions.at("main");
 
-    return true;
+    main->execute(nullptr, definedFunctions, {});
+
+    // std::shared_ptr<Literal> lit = std::make_shared<Literal>();
+
+    // lit->data = {
+    //     { 1, 2, 3 },
+    //     { 4, 5, 7}
+    // };
+
+    // StdLib::callFunction("print", { lit });
+
 }

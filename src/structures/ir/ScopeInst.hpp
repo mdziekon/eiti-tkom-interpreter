@@ -4,23 +4,27 @@
 #include <unordered_map>
 #include <string>
 #include <memory>
+#include <vector>
 
-#include "Variable.hpp"
-#include "Literal.hpp"
+#include "../../modules/error-handler/ErrorHandler.hpp"
+using ErrorHandler = tkom::modules::ErrorHandler;
 
 namespace tkom { namespace structures { namespace ir
 {
+    struct Literal;
+
     struct ScopeInst
     {
         ScopeInst* upperScope = nullptr;
-        std::unordered_map<std::string, Literal> variables;
+        std::unordered_map<std::string, std::shared_ptr<Literal>> variables;
+        std::vector<std::string> varOrder;
 
-        Literal* getVariable(const std::string& name)
+        std::shared_ptr<Literal> getVariable(const std::string& name)
         {
             auto it = this->variables.find(name);
             if (it != this->variables.end())
             {
-                return &(it->second);
+                return it->second;
             }
 
             if (this->upperScope != nullptr)
@@ -29,6 +33,25 @@ namespace tkom { namespace structures { namespace ir
             }
 
             return nullptr;
+        }
+
+        void setVariable(const std::string& name, std::shared_ptr<Literal> literal)
+        {
+            auto it = this->variables.find(name);
+            if (it != this->variables.end())
+            {
+                it->second = literal;
+            }
+
+            if (this->upperScope != nullptr)
+            {
+                this->upperScope->setVariable(name, literal);
+            }
+
+            ErrorHandler::error(
+                std::string("Setting undefined variable")
+            );
+            return ;
         }
     };
 }}}

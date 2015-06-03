@@ -6,7 +6,12 @@
 namespace tkom { namespace structures { namespace ir
 {
     struct Instruction: virtual public Executable
-    {};
+    {
+        virtual bool canDoReturn()
+        {
+            return false;
+        }
+    };
 }}}
 
 #endif
