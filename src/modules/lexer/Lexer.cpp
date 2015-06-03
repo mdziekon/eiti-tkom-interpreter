@@ -2,6 +2,7 @@
 
 #include <cctype>
 #include <cstdio>
+#include <algorithm>
 
 #include "../utils/Keywords.hpp"
 
@@ -46,11 +47,13 @@ const Token Lexer::nextToken()
         while(isalnum(sign) || sign == '_' || sign == '$');
 
         this->reader.rewind();
+        auto tempBuff = buffer;
+        std::transform(tempBuff.begin(), tempBuff.end(), tempBuff.begin(), ::tolower);
 
-        if (utils::keywords.count(buffer) == 1)
+        if (utils::keywords.count(tempBuff) == 1)
         {
             // Keyword
-            token.type = utils::keywords.at(buffer);
+            token.type = utils::keywords.at(tempBuff);
         }
         else
         {
@@ -161,51 +164,18 @@ const Token Lexer::nextToken()
                 }
                 break;
             }
-            case '(':
-                token.type = TokenType::ParenthOpen;
-                break;
-            case ')':
-                token.type = TokenType::ParenthClose;
-                break;
-            case '{':
-                token.type = TokenType::BracketOpen;
-                break;
-            case '}':
-                token.type = TokenType::BracketClose;
-                break;
-            case '[':
-                token.type = TokenType::SquareBracketOpen;
-                break;
-            case ']':
-                token.type = TokenType::SquareBracketClose;
-                break;
-            case ',':
-                token.type = TokenType::Comma;
-                break;
-            case ';':
-                token.type = TokenType::Semicolon;
-                break;
-            case '+':
-                token.type = TokenType::Plus;
-                break;
-            case '-':
-                token.type = TokenType::Minus;
-                break;
-            case '*':
-                token.type = TokenType::Multiply;
-                break;
-            case '/':
-                token.type = TokenType::Divide;
-                break;
-            case '%':
-                token.type = TokenType::Modulo;
-                break;
-            case '.':
-                token.type = TokenType::Dot;
-                break;
             default:
-                token.type = TokenType::Invalid;
+            {
+                if (utils::simpleSigns.count(sign) == 1)
+                {
+                    token.type = utils::simpleSigns.at(sign);
+                }
+                else
+                {
+                    token.type = TokenType::Invalid;
+                }
                 break;
+            }
         }
     }
 

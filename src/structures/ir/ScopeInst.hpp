@@ -41,11 +41,13 @@ namespace tkom { namespace structures { namespace ir
             if (it != this->variables.end())
             {
                 it->second = literal;
+                return;
             }
 
             if (this->upperScope != nullptr)
             {
                 this->upperScope->setVariable(name, literal);
+                return;
             }
 
             ErrorHandler::error(

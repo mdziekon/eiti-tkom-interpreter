@@ -17,13 +17,4 @@ void Executor::execute(const std::vector<std::shared_ptr<ir::Function>>& functio
 
     main->execute(nullptr, definedFunctions, {});
 
-    // std::shared_ptr<Literal> lit = std::make_shared<Literal>();
-
-    // lit->data = {
-    //     { 1, 2, 3 },
-    //     { 4, 5, 7}
-    // };
-
-    // StdLib::callFunction("print", { lit });
-
 }
