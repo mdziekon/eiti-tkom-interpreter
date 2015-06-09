@@ -1,5 +1,5 @@
 # Techniki Kompilacji - Projekt - Interpreter języka skryptowego z wbudowanym typem macierzy
-Projekt wykonany w ramach przedmiotu TKOM (Techniki Kompilacji) w semestrze 2015L (5 semestr), na kierunku Informatyka, specjalizacji Inżynieria Systemów Informacyjnych (ISI) na Wydziale Elektroniki i Technik Informacyjnych (EiTI) Politechniki Warszawskiej.
+Projekt wykonany w ramach przedmiotu TKOM (Techniki Kompilacji) w semestrze 2015L (6 semestr), na kierunku Informatyka, specjalizacji Inżynieria Systemów Informacyjnych (ISI) na Wydziale Elektroniki i Technik Informacyjnych (EiTI) Politechniki Warszawskiej.
 
 **Prowadzący projekt**: dr Piotr Gawkowski  
 **Ocena**: 25/25
